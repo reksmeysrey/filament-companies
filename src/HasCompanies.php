@@ -24,11 +24,12 @@ trait HasCompanies
      */
     public function currentCompany(): BelongsTo
     {
-        if ($this->current_company_id === null && $this->id) {
+        $current_id = config('filament-tenant.current_foreign_key_id');
+        if ($this->{$current_id} === null && $this->id) {
             $this->switchCompany($this->personalCompany());
         }
 
-        return $this->belongsTo(FilamentCompanies::companyModel(), 'current_company_id');
+        return $this->belongsTo(FilamentCompanies::companyModel(), $current_id);
     }
 
     /**
@@ -36,19 +37,19 @@ trait HasCompanies
      */
     public function switchCompany(mixed $company): bool
     {
-        if (! $this->belongsToCompany($company)) {
+        if (!$this->belongsToCompany($company)) {
             return false;
         }
+        $current_foreign_key_id = config('filament-tenant.current_foreign_key_id');
 
         $this->forceFill([
-            'current_company_id' => $company->id,
+            $current_foreign_key_id => $company->id,
         ])->save();
 
         $this->setRelation('currentCompany', $company);
 
         return true;
     }
-
     /**
      * Get all the companies the user owns or belongs to.
      */

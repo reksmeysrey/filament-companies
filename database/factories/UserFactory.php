@@ -30,6 +30,7 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $current_foreign_key_id = config('filament-tenant.current_foreign_key_id');
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
@@ -37,7 +38,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'profile_photo_path' => null,
-            'current_company_id' => null,
+            $current_foreign_key_id => null,
         ];
     }
 
@@ -46,7 +47,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -56,14 +57,15 @@ class UserFactory extends Factory
      */
     public function withPersonalCompany(?callable $callback = null): static
     {
-        if (! FilamentCompanies::hasCompanyFeatures()) {
+        if (!FilamentCompanies::hasCompanyFeatures()) {
             return $this->state([]);
         }
+        $model = config('filament-tenant.company_model');
 
         return $this->has(
-            Company::factory()
-                ->state(fn (array $attributes, User $user) => [
-                    'name' => $user->name . '\'s Company',
+            $model::factory()
+                ->state(fn(array $attributes, User $user) => [
+                    'name' => $user->name.'\'s Company',
                     'user_id' => $user->id,
                     'personal_company' => true,
                 ])

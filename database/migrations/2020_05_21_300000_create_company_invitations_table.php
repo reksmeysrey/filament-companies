@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('company_invitations', function (Blueprint $table) {
+        $tableName = config('filament-tenant.company_invitation_table_name');
+        $foreign_key = config('filament-tenant.foreign_key');
+        Schema::create($tableName, function (Blueprint $table) use ($foreign_key) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId($foreign_key)->constrained()->cascadeOnDelete();
             $table->string('email');
             $table->string('role')->nullable();
             $table->timestamps();
 
-            $table->unique(['company_id', 'email']);
+            $table->unique([$foreign_key, 'email']);
         });
     }
 
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('company_invitations');
+        Schema::dropIfExists(config('filament-tenant.company_invitation_table_name'));
     }
 };

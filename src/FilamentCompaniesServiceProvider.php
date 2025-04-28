@@ -29,6 +29,8 @@ class FilamentCompaniesServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/filament-tenant.php', 'filament-tenant');
+
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'filament-companies');
 
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'filament-companies');

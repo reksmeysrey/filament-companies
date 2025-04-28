@@ -12,7 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        $current_foreign_key_id = config('filament-tenant.current_foreign_key_id');
+        Schema::create('users', function (Blueprint $table) use ($current_foreign_key_id) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -21,7 +22,7 @@ return new class extends Migration
                 FilamentCompanies::hasSocialiteFeatures()
             );
             $table->rememberToken();
-            $table->foreignId('current_company_id')->nullable();
+            $table->foreignId($current_foreign_key_id)->nullable();
             $table->foreignId('current_connected_account_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
