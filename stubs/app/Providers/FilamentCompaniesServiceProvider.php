@@ -83,6 +83,7 @@ class FilamentCompaniesServiceProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Company/Pages'), for: 'App\\Filament\\Company\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                Profile::class,
             ])
             ->userMenuItems([
                 'profile' => MenuItem::make()

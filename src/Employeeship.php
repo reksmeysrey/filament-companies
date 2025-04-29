@@ -6,10 +6,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 abstract class Employeeship extends Pivot
 {
-    /**
-     * The table associated with the pivot model.
-     *
-     * @var string
-     */
-    protected $table = 'company_user';
+    public function getTable()
+    {
+        return config('filament-tenant.pivot_table') ?? 'company_user';
+    }
 }

@@ -34,7 +34,7 @@ trait HasBaseModels
      */
     public static function userModel(): string
     {
-        return static::$userModel;
+        return config('filament-tenant.user_model') ?? static::$userModel;
     }
 
     /**
@@ -42,7 +42,7 @@ trait HasBaseModels
      */
     public static function companyModel(): string
     {
-        return static::$companyModel;
+        return config('filament-tenant.company_model') ?? static::$companyModel;
     }
 
     /**
@@ -50,7 +50,7 @@ trait HasBaseModels
      */
     public static function employeeshipModel(): string
     {
-        return static::$employeeshipModel;
+        return config('filament-tenant.employeeship_model') ?? static::$employeeshipModel;
     }
 
     /**
@@ -58,7 +58,7 @@ trait HasBaseModels
      */
     public static function companyInvitationModel(): string
     {
-        return static::$companyInvitationModel;
+        return config('filament-tenant.company_invitation_model') ?? static::$companyInvitationModel;
     }
 
     /**

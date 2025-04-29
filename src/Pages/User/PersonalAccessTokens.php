@@ -58,7 +58,8 @@ class PersonalAccessTokens extends Page implements Tables\Contracts\HasTable
         $auth = Filament::auth();
 
         return PersonalAccessToken::whereTokenableId($auth->user()?->getAuthIdentifier())
-            ->whereTokenableType(FilamentCompanies::userModel());
+            ->where('tokenable_type', (FilamentCompanies::userModel()::make())->getMorphClass())
+            ->orWhere('tokenable_type', FilamentCompanies::userModel());
     }
 
     public function table(Table $table): Table

@@ -5,6 +5,7 @@ namespace Wallo\FilamentCompanies\Concerns\Base;
 use App\Models\CompanyInvitation;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Database\Eloquent\Model;
 use Wallo\FilamentCompanies\Http\Controllers\CompanyInvitationController;
 use Wallo\FilamentCompanies\Http\Controllers\OAuthController;
 use Wallo\FilamentCompanies\Pages\Auth\PrivacyPolicy;
@@ -64,7 +65,7 @@ trait HasRoutes
         return static::route('oauth.redirect', compact('provider'));
     }
 
-    public static function generateAcceptInvitationUrl(CompanyInvitation $invitation): string
+    public static function generateAcceptInvitationUrl(Model $invitation): string
     {
         return URL::signedRoute(static::generateRouteName('invitations.accept'), compact('invitation'));
     }

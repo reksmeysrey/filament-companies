@@ -76,9 +76,10 @@ abstract class Company extends Model
      */
     public function removeUser(mixed $user): void
     {
-        if ($user->current_company_id === $this->id) {
+        $current_foreign_key_id = config('filament-tenant.current_foreign_key_id');
+        if ($user->{$current_foreign_key_id} === $this->id) {
             $user->forceFill([
-                'current_company_id' => null,
+                $current_foreign_key_id => null,
             ])->save();
         }
 
@@ -90,11 +91,12 @@ abstract class Company extends Model
      */
     public function purge(): void
     {
-        $this->owner()->where('current_company_id', $this->id)
-            ->update(['current_company_id' => null]);
+        $current_foreign_key_id = config('filament-tenant.current_foreign_key_id');
+        $this->owner()->where($current_foreign_key_id, $this->id)
+            ->update([$current_foreign_key_id => null]);
 
-        $this->users()->where('current_company_id', $this->id)
-            ->update(['current_company_id' => null]);
+        $this->users()->where($current_foreign_key_id, $this->id)
+            ->update([$current_foreign_key_id => null]);
 
         $this->users()->detach();
 

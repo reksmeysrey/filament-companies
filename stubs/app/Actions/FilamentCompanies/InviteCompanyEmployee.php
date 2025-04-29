@@ -62,16 +62,20 @@ class InviteCompanyEmployee implements InvitesCompanyEmployees
      */
     protected function rules(Company $company): array
     {
+        $current_foreign_key_id = config('filament-tenant.current_foreign_key_id');
         return array_filter([
             'email' => [
                 'required', 'email',
-                Rule::unique('company_invitations')->where(static function (Builder $query) use ($company) {
-                    $query->where('company_id', $company->id);
+                Rule::unique('company_invitations')->where(static function (Builder $query) use (
+                    $company,
+                    $current_foreign_key_id
+                ) {
+                    $query->where($current_foreign_key_id, $company->id);
                 }),
             ],
             'role' => FilamentCompanies::hasRoles()
-                            ? ['required', 'string', new Role]
-                            : null,
+                ? ['required', 'string', new Role]
+                : null,
         ]);
     }
 

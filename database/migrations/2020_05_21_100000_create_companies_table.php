@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
+        $tableName = config('filament-tenant.company_model_table');
+        Schema::create($tableName, function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index();
             $table->string('name');
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists(config('filament-tenant.company_model_table'));
     }
 };
