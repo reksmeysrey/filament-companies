@@ -2,11 +2,14 @@
 
 namespace Wallo\FilamentCompanies;
 
+use Filament\Auth\Http\Responses\Contracts\RegistrationResponse as RegistrationResponseContract;
 use Filament\Contracts\Plugin;
 use Filament\Events\TenantSet;
-use Filament\Http\Responses\Auth\Contracts\RegistrationResponse as RegistrationResponseContract;
 use Filament\Panel;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 use Wallo\FilamentCompanies\Contracts\CreatesConnectedAccounts;
@@ -21,6 +24,7 @@ use Wallo\FilamentCompanies\Pages\Company\CreateCompany;
 
 class FilamentCompanies implements Plugin
 {
+    use Concerns\Base\HasAddedCompanyComponents;
     use Concerns\Base\HasAddedProfileComponents;
     use Concerns\Base\HasAutoAcceptInvitations;
     use Concerns\Base\HasBaseActionBindings;
@@ -34,6 +38,7 @@ class FilamentCompanies implements Plugin
     use Concerns\Base\HasPermissions;
     use Concerns\Base\HasRoutes;
     use Concerns\Base\HasTermsAndPrivacyPolicy;
+    use Concerns\ManagesCompanyComponents;
     use Concerns\ManagesProfileComponents;
     use Concerns\Socialite\CanEnableSocialite;
     use Concerns\Socialite\HasConnectedAccountModel;
@@ -86,5 +91,22 @@ class FilamentCompanies implements Plugin
         if (static::switchesCurrentCompany()) {
             Event::listen(TenantSet::class, SwitchCurrentCompany::class);
         }
+
+        if (static::hasSocialiteFeatures()) {
+            $this->registerSocialiteRenderHooks();
+        }
+    }
+
+    protected function registerSocialiteRenderHooks(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
+            fn (): View => view('filament-companies::components.socialite-login'),
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::AUTH_REGISTER_FORM_AFTER,
+            fn (): View => view('filament-companies::components.socialite-login'),
+        );
     }
 }
