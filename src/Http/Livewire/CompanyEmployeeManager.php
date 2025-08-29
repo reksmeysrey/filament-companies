@@ -7,11 +7,13 @@ use Filament\Notifications\Notification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Wallo\FilamentCompanies\Actions\UpdateCompanyEmployeeRole;
 use Wallo\FilamentCompanies\Contracts\AddsCompanyEmployees;
@@ -114,6 +116,7 @@ class CompanyEmployeeManager extends Component
     public function cancelCompanyInvitation(int $invitationId): void
     {
         if (! empty($invitationId)) {
+            /** @var class-string<Model> $model */
             $model = FilamentCompanies::companyInvitationModel();
 
             $model::whereKey($invitationId)->delete();
@@ -235,7 +238,8 @@ class CompanyEmployeeManager extends Component
     /**
      * Get the current user of the application.
      */
-    public function getUserProperty(): ?Authenticatable
+    #[Computed]
+    public function user(): ?Authenticatable
     {
         return Auth::user();
     }
@@ -243,7 +247,8 @@ class CompanyEmployeeManager extends Component
     /**
      * Get the available company employee roles.
      */
-    public function getRolesProperty(): array
+    #[Computed]
+    public function roles(): array
     {
         return collect(FilamentCompanies::$roles)->transform(static function ($role) {
             return with($role->jsonSerialize(), static function ($data) {
@@ -264,7 +269,7 @@ class CompanyEmployeeManager extends Component
         return view('filament-companies::companies.company-employee-manager');
     }
 
-    public function employeeInvitationSent($email): void
+    public function employeeInvitationSent(#[\SensitiveParameter] $email): void
     {
         Notification::make()
             ->title(__('filament-companies::default.notifications.company_invitation_sent.title'))

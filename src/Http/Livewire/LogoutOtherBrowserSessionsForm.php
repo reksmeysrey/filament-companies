@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class LogoutOtherBrowserSessionsForm extends Component
@@ -94,7 +95,8 @@ class LogoutOtherBrowserSessionsForm extends Component
     /**
      * Get the current sessions.
      */
-    public function getSessionsProperty(): Collection
+    #[Computed]
+    public function sessions(): Collection
     {
         if (config('session.driver') !== 'database') {
             return collect();
@@ -105,7 +107,7 @@ class LogoutOtherBrowserSessionsForm extends Component
                 ->where('user_id', Auth::user()?->getAuthIdentifier())
                 ->orderBy('last_activity', 'desc')
                 ->get()
-        )->map(function ($session) {
+        )->map(function (#[\SensitiveParameter] $session) {
             $deviceDetector = $this->createAgent($session);
 
             return (object) [
@@ -123,7 +125,7 @@ class LogoutOtherBrowserSessionsForm extends Component
     /**
      * Create a new agent instance from the given session.
      */
-    protected function createAgent(mixed $session): DeviceDetector
+    protected function createAgent(#[\SensitiveParameter] mixed $session): DeviceDetector
     {
         $deviceDetector = new DeviceDetector($session->user_agent);
         $deviceDetector->parse();

@@ -1,7 +1,7 @@
 ![gif (1)](https://user-images.githubusercontent.com/104294090/221399175-add7c34b-4887-49b7-9061-6781f6391409.gif)
 <p align="center">
-    <a href="https://filamentphp.com/docs/3.x/panels/installation">
-        <img alt="FILAMENT 3.x" src="https://img.shields.io/badge/FILAMENT-3.x-EBB304?style=for-the-badge">
+    <a href="https://filamentphp.com">
+        <img alt="FILAMENT 4.x" src="https://img.shields.io/badge/FILAMENT-4.x-EBB304?style=for-the-badge">
     </a>
     <a href="https://packagist.org/packages/andrewdwallo/filament-companies">
         <img alt="Packagist" src="https://img.shields.io/packagist/v/andrewdwallo/filament-companies.svg?style=for-the-badge&logo=packagist">
@@ -32,7 +32,7 @@ A comprehensive multi-tenant authentication and authorization solution designed 
 
 * Create a fresh Laravel Project
 * Configure your database
-* Install the [Panel Builder](https://filamentphp.com/docs/3.x/panels/installation#installation)
+* Install the [Panel Builder](https://filamentphp.com/docs/4.x/introduction/installation#installing-the-panel-builder)
 
 After installing the Panel Builder, ensure you create a panel using the following command:
 ```shell
@@ -68,31 +68,12 @@ If you encounter any issues while setting up your application with this package,
 
 After installation, there will be a company panel registered for your application. It is located within the `FilamentCompaniesServiceProvider.php` file.
 
-In order for Tailwind to process the CSS used within this package and for the company panel, a user must [create a custom theme](https://filamentphp.com/docs/3.x/panels/themes#creating-a-custom-theme). 
+In order for Tailwind to process the CSS used within this package and for the company panel, a user must [create a custom theme](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme).
 
-To create a custom theme for the company panel, you can use the following command:
-```shell
-php artisan make:filament-theme company
-```
-> 🛠️ Please follow the instructions in the console to complete the setup process
+Once the custom theme for the company panel is created, add this package's vendor directory to your `resources/css/filament/company/theme.css` file:
 
-Here is a reference to the instructions that should show after running the command:
-```shell
-⇂ First, add a new item to the `input` array of `vite.config.js`: `resources/css/filament/company/theme.css`  
-⇂ Next, register the theme in the company panel provider using `->viteTheme('resources/css/filament/company/theme.css')`  
-⇂ Finally, run `npm run build` to compile the theme
-```
-
-Once the custom theme for the company panel is created, add this package's vendor directory to the `content` array in the `tailwind.config.js` file, located in `resources/css/filament/company/`:
-```js
-export default {
-    content: [
-        './resources/**/*.blade.php',
-        './vendor/filament/**/*.blade.php',
-        './vendor/andrewdwallo/filament-companies/resources/views/**/*.blade.php', // The package's vendor directory
-    ],
-    // ...
-}
+```css
+@source '../../../../vendor/andrewdwallo/filament-companies/resources/views';
 ```
 
 ### The User Panel
@@ -116,7 +97,7 @@ public function panel(Panel $panel): Panel
         ])
 }
 ```
-> 🛑 You may create a separate User Panel following the documentation for [creating a new panel](https://filamentphp.com/docs/3.x/panels/configuration#creating-a-new-panel)
+> 🛑 You may create a separate User Panel following the documentation for [creating a new panel](https://filamentphp.com/docs/4.x/panel-configuration#creating-a-new-panel)
 
 Ensure users have a way to navigate to the Profile and Personal Access Tokens pages.
 
@@ -214,7 +195,7 @@ php artisan vendor:publish --tag=filament-companies-views
 
 ### Email Verification
 
-If you are using [email verification](https://filamentphp.com/docs/3.x/panels/users#authentication-features) make sure to register your verify-email url. If this is not properly registerd, you may see errors on the user profile page. You can either add this via Filament's `VerifyEmail` facade or a new route in your app.
+If you are using [email verification](https://filamentphp.com/docs/4.x/users/overview#authentication-features) make sure to register your verify-email url. If this is not properly registerd, you may see errors on the user profile page. You can either add this via Filament's `VerifyEmail` facade or a new route in your app.
 
 #### Registering the URL via the create URL Notification callback
 
@@ -366,6 +347,65 @@ Within your component's view, you may use the grid section component to match th
         </x-filament-panels::form>
     </x-filament::section>
 </x-filament-companies::grid-section>
+```
+
+## Configuring Company Settings Features
+
+Similar to profile features, you can customize the company settings page by enabling specific features and customizing their components.
+
+```php
+use Filament\Panel;
+use Wallo\FilamentCompanies\FilamentCompanies;
+
+class FilamentCompaniesServiceProvider extends PanelProvider
+{
+    public function panel(Panel $panel): Panel
+    {
+        return $panel
+            // ...
+            ->plugin(
+                FilamentCompanies::make()
+                    ->updateCompanyInformation()   // Enables updating company names
+                    ->manageCompanyEmployees()     // Enables company employee management
+                    ->companyDeletion()            // Enables company deletion
+            );
+    }
+}
+```
+
+### Customizing Company Settings Components
+
+You can replace default company settings components with your own custom components:
+
+```php
+use App\Livewire\CustomCompanyComponent;
+
+FilamentCompanies::make()
+    ->updateCompanyInformation(component: CustomCompanyComponent::class);
+```
+
+### Sorting Company Settings Components
+
+Change the order of company settings features by setting the `sort` parameter:
+
+```php
+FilamentCompanies::make()
+    ->updateCompanyInformation(sort: 0)
+    ->manageCompanyEmployees(sort: 1)
+    ->companyDeletion(sort: 2);
+```
+
+### Adding Company Settings Components
+
+If you would like to add custom company settings components, you may do so by passing the component class name along with the sort order to the `addCompanyComponents()` method:
+
+```php
+use App\Livewire\CustomCompanyComponent;
+
+FilamentCompanies::make()
+    ->addCompanyComponents([
+        5 => CustomCompanyComponent::class,
+    ]);
 ```
 
 ## Profile Photos
